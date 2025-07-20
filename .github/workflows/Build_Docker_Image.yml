@@ -25,7 +25,7 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./YourApp/YourApp.csproj -c Release -o ./published
+        run: dotnet publish ./ProductService.csproj -c Release -o ./published
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
