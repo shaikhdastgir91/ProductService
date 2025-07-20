@@ -3,33 +3,31 @@ name: Build Docker Image
 on:
   workflow_run:
     workflows: ["Build and Publish .NET Project"]
-      types:
-       - completed
+    types:
+      - completed
 
+jobs:
+  docker:
+    runs-on: ubuntu-latest
 
-
-  Docker:
-    build:
-    needs: build
-    
     steps:
       - name: Checkout code
-        uses: action/Checkout@v4
+        uses: actions/checkout@v4
 
       - name: Download published artifact
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@v4
         with:
-          name: published-App
+          name: Published-App
           path: ./published
-      
-      - name:  Build Docker image
-        run: docker build -t product-app-image:latest
 
-      - name: Save Docker Image as .tar
+      - name: Build Docker image
+        run: docker build -t product-app-image:latest .
+
+      - name: Save Docker image as .tar
         run: docker save product-app-image:latest -o product-app-image.tar
-      
-      -name: Upload Docker Artifact
-       uses: actions/upload-artifact@v4
+
+      - name: Upload Docker image
+        uses: actions/upload-artifact@v4
         with:
-          name: ProductImage
-          path: ./product-app-image.tar
+          name: DockerImage
+          path: product-app-image.tar
