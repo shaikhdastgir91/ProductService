@@ -1,33 +1,59 @@
-name: Build Docker Image
+name: Full CI Pipeline
 
 on:
-  workflow_run:
-    workflows: ["Build and Publish .NET Project"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download published artifact
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ./YourApp/YourApp.csproj -c Release -o ./published
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Published-App
+          path: ./published
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: Published-App
           path: ./published
 
       - name: Build Docker image
-        run: docker build -t product-app-image:latest .
+        run: docker build -t my-image:latest .
 
-      - name: Save Docker image as .tar
-        run: docker save product-app-image:latest -o product-app-image.tar
+      - name: Save image
+        run: docker save my-image:latest -o my-image.tar
 
-      - name: Upload Docker image file
+      - name: Upload image
         uses: actions/upload-artifact@v4
         with:
           name: DockerImage
-          path: product-app-image.tar
+          path: my-image.tar

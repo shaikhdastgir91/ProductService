@@ -34,3 +34,4 @@ jobs:
         with:
           name: Published-App
           path: ./published
+          
