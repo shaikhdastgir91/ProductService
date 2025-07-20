@@ -18,7 +18,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Published-App
-          path: ./published
+          path: ./publish
 
       - name: Build Docker image
         run: docker build -t product-app-image:latest .
