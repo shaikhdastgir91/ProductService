@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,25 +14,23 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Setup .NET Core SDK
+
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore depedencies
+      - name: Restore dependencies
         run: dotnet restore
-      
-      - name: Build the Project
-        run: dotnet build --configuration Release --no-restore  
-      
-      - name: Publish Project
-        run:  dotnet publish -c Release -o ./published
-      
-      - name: Upload Publish folder
+
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish project
+        run: dotnet publish ./ProductService/ProductService.csproj -c Release -o ./published
+
+      - name: Upload published output
         uses: actions/upload-artifact@v4
         with:
           name: Published-App
           path: ./published
-
-
